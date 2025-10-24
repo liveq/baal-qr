@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="무료 QR 코드 생성기. URL, 텍스트, 연락처, Wi-Fi QR 코드를 만드세요. 색상 커스터마이징, 로고 추가 가능.">
+    <meta name="keywords" content="QR 코드, QR 생성기, QR code generator, 큐알코드, 무료 QR">
+    <meta name="author" content="BAAL">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://qr.baal.co.kr/">
+    <meta property="og:title" content="QR 코드 생성기 - 무료 온라인 도구">
+    <meta property="og:description" content="URL, 텍스트, 연락처 QR 코드를 빠르게 생성하세요. 색상/로고 커스터마이징 지원.">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://qr.baal.co.kr/">
+    <meta property="twitter:title" content="QR 코드 생성기 - 무료 온라인 도구">
+    <meta property="twitter:description" content="URL, 텍스트, 연락처 QR 코드를 빠르게 생성하세요.">
+
+    <title>QR 코드 생성기 - BAAL</title>
+
+    <!-- Google AdSense -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2886185075996969"
+     crossorigin="anonymous"></script>
+
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-XXXXXXXXXX');
+    </script>
+
+    <!-- 라이브러리 -->
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+
+    <!-- 공통 스타일 -->
+    <link rel="stylesheet" href="_common/common.css">
+    <style>
+        .qr-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        @media (max-width: 768px) {
+            .qr-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .qr-input-section {
+            background: var(--bg-secondary);
+            padding: 25px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+        }
+
+        .qr-preview-section {
+            background: var(--bg-secondary);
+            padding: 25px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 0.95em;
+        }
+
+        .form-input,
+        .form-select,
+        .form-textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 0.95em;
+            background: white;
+            color: var(--text-primary);
+            transition: border-color 0.2s;
+        }
+
+        .form-input:focus,
+        .form-select:focus,
+        .form-textarea:focus {
+            outline: none;
+            border-color: var(--gold-primary);
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 80px;
+            font-family: inherit;
+        }
+
+        .color-input-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .color-input-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        input[type="color"] {
+            width: 50px;
+            height: 40px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .qr-preview-canvas {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            border: 2px solid var(--border-color);
+            margin-bottom: 20px;
+        }
+
+        #qrCanvas {
+            display: block;
+            max-width: 100%;
+            height: auto;
+        }
+
+        .download-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .btn-download {
+            padding: 10px 20px;
+            background: var(--gold-primary);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-download:hover {
+            background: var(--gold-hover);
+        }
+
+        .btn-download:disabled {
+            background: var(--text-tertiary);
+            cursor: not-allowed;
+        }
+
+        .type-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .type-tab {
+            padding: 8px 16px;
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.2s;
+        }
+
+        .type-tab:hover {
+            border-color: var(--gold-primary);
+        }
+
+        .type-tab.active {
+            background: var(--gold-primary);
+            color: white;
+            border-color: var(--gold-primary);
+        }
+
+        .vcard-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        @media (max-width: 480px) {
+            .vcard-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .empty-preview {
+            text-align: center;
+            color: var(--text-secondary);
+            padding: 60px 20px;
+        }
+
+        .empty-preview svg {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 15px;
+            opacity: 0.3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <a href="https://baal.co.kr" style="text-decoration: none; color: inherit;">
+                    <span style="color: var(--gold-primary); font-weight: 700; font-size: 1.5em;">BAAL</span>
+                </a>
+            </div>
+            <div class="language-toggle">
+                <button id="langBtn" onclick="window.BaalUtils.toggleLanguage()">
+                    <span data-ko="🇰🇷 한국어" data-en="🇺🇸 English">🇰🇷 한국어</span>
+                </button>
+            </div>
+        </header>
+
+        <main>
+            <h1 id="pageTitle" style="text-align: center; margin-bottom: 15px;">
+                <span data-ko="QR 코드 생성기" data-en="QR Code Generator">QR 코드 생성기</span>
+            </h1>
+            <p style="text-align: center; color: var(--text-secondary); margin-bottom: 30px;">
+                <span data-ko="URL, 텍스트, 연락처 등을 QR 코드로 변환하세요" data-en="Convert URL, text, contact info to QR code">URL, 텍스트, 연락처 등을 QR 코드로 변환하세요</span>
+            </p>
+
+            <div class="qr-container">
+                <!-- 입력 섹션 -->
+                <div class="qr-input-section">
+                    <h2 style="margin-bottom: 20px; font-size: 1.2em;">
+                        <span data-ko="내용 입력" data-en="Input Content">내용 입력</span>
+                    </h2>
+
+                    <!-- 타입 선택 -->
+                    <div class="form-group">
+                        <label class="form-label" data-ko="QR 타입" data-en="QR Type">QR 타입</label>
+                        <div class="type-tabs">
+                            <button class="type-tab active" data-type="text" onclick="selectType('text')">
+                                <span data-ko="텍스트" data-en="Text">텍스트</span>
+                            </button>
+                            <button class="type-tab" data-type="url" onclick="selectType('url')">
+                                <span data-ko="URL" data-en="URL">URL</span>
+                            </button>
+                            <button class="type-tab" data-type="email" onclick="selectType('email')">
+                                <span data-ko="이메일" data-en="Email">이메일</span>
+                            </button>
+                            <button class="type-tab" data-type="phone" onclick="selectType('phone')">
+                                <span data-ko="전화" data-en="Phone">전화</span>
+                            </button>
+                            <button class="type-tab" data-type="sms" onclick="selectType('sms')">
+                                <span data-ko="SMS" data-en="SMS">SMS</span>
+                            </button>
+                            <button class="type-tab" data-type="wifi" onclick="selectType('wifi')">
+                                <span data-ko="Wi-Fi" data-en="Wi-Fi">Wi-Fi</span>
+                            </button>
+                            <button class="type-tab" data-type="vcard" onclick="selectType('vcard')">
+                                <span data-ko="연락처" data-en="vCard">연락처</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 동적 입력 폼 -->
+                    <div id="inputForm">
+                        <!-- JavaScript로 렌더링 -->
+                    </div>
+
+                    <!-- 옵션 -->
+                    <h3 style="margin: 25px 0 15px 0; font-size: 1.1em;">
+                        <span data-ko="옵션" data-en="Options">옵션</span>
+                    </h3>
+
+                    <div class="form-group">
+                        <label class="form-label" data-ko="크기" data-en="Size">크기</label>
+                        <select class="form-select" id="qrSize" onchange="generateQR()">
+                            <option value="200">200 x 200</option>
+                            <option value="300" selected>300 x 300</option>
+                            <option value="400">400 x 400</option>
+                            <option value="500">500 x 500</option>
+                            <option value="800">800 x 800</option>
+                            <option value="1000">1000 x 1000</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" data-ko="에러 수정 레벨" data-en="Error Correction">에러 수정 레벨</label>
+                        <select class="form-select" id="errorLevel" onchange="generateQR()">
+                            <option value="L">L (7%)</option>
+                            <option value="M" selected>M (15%)</option>
+                            <option value="Q">Q (25%)</option>
+                            <option value="H">H (30%)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" data-ko="색상" data-en="Colors">색상</label>
+                        <div class="color-input-group">
+                            <div>
+                                <label style="font-size: 0.85em; color: var(--text-secondary); display: block; margin-bottom: 5px;" data-ko="전경색" data-en="Foreground">전경색</label>
+                                <div class="color-input-wrapper">
+                                    <input type="color" id="colorDark" value="#000000" onchange="generateQR()">
+                                    <input type="text" class="form-input" id="colorDarkText" value="#000000" style="flex: 1;" onchange="syncColor('dark')">
+                                </div>
+                            </div>
+                            <div>
+                                <label style="font-size: 0.85em; color: var(--text-secondary); display: block; margin-bottom: 5px;" data-ko="배경색" data-en="Background">배경색</label>
+                                <div class="color-input-wrapper">
+                                    <input type="color" id="colorLight" value="#ffffff" onchange="generateQR()">
+                                    <input type="text" class="form-input" id="colorLightText" value="#ffffff" style="flex: 1;" onchange="syncColor('light')">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" data-ko="로고 이미지 (선택사항)" data-en="Logo Image (Optional)">로고 이미지 (선택사항)</label>
+                        <input type="file" class="form-input" id="logoInput" accept="image/*" onchange="handleLogoUpload(event)">
+                        <small style="color: var(--text-secondary); font-size: 0.85em; display: block; margin-top: 5px;">
+                            <span data-ko="로고는 QR 코드 중앙에 표시됩니다" data-en="Logo will be placed in the center">로고는 QR 코드 중앙에 표시됩니다</span>
+                        </small>
+                    </div>
+                </div>
+
+                <!-- 미리보기 섹션 -->
+                <div class="qr-preview-section">
+                    <h2 style="margin-bottom: 20px; font-size: 1.2em; align-self: flex-start;">
+                        <span data-ko="미리보기" data-en="Preview">미리보기</span>
+                    </h2>
+
+                    <div id="qrPreview" class="empty-preview">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M3 11h8V3H3v8zm2-6h4v4H5V5zm-2 14h8v-8H3v8zm2-6h4v4H5v-4zM13 3v8h8V3h-8zm6 6h-4V5h4v4zm-6 4h2v2h-2v-2zm2 2h2v2h-2v-2zm-2 2h2v2h-2v-2zm4 0h2v2h-2v-2zm2-2h2v2h-2v-2zm0-4h2v2h-2v-2zm-4 0h2v2h-2v-2z"/>
+                        </svg>
+                        <p data-ko="내용을 입력하면 QR 코드가 생성됩니다" data-en="Enter content to generate QR code">내용을 입력하면 QR 코드가 생성됩니다</p>
+                    </div>
+
+                    <div id="downloadButtons" class="download-buttons" style="display: none;">
+                        <button class="btn-download" onclick="downloadQR('png')">
+                            <span data-ko="PNG 다운로드" data-en="Download PNG">PNG 다운로드</span>
+                        </button>
+                        <button class="btn-download" onclick="downloadQR('svg')">
+                            <span data-ko="SVG 다운로드" data-en="Download SVG">SVG 다운로드</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            <div class="footer-content">
+                <p class="footer-brand">
+                    Made by <a href="https://baal.co.kr" target="_blank">BAAL</a>
+                </p>
+                <p class="footer-contact">
+                    <a href="mailto:baal.contract@gmail.com">baal.contract@gmail.com</a>
+                </p>
+                <p class="footer-links">
+                    <a href="https://baal.co.kr/privacy" target="_blank" data-ko="개인정보처리방침" data-en="Privacy Policy">개인정보처리방침</a>
+                    <span class="separator">|</span>
+                    <a href="https://baal.co.kr/terms" target="_blank" data-ko="이용약관" data-en="Terms of Service">이용약관</a>
+                </p>
+                <p class="footer-copyright">&copy; 2025 BAAL. All rights reserved.</p>
+            </div>
+        </footer>
+    </div>
+
+    <!-- 공통 스크립트 -->
+    <script src="_common/common.js"></script>
+    <script>
+        let currentType = 'text';
+        let logoImage = null;
+
+        // 타입 선택
+        function selectType(type) {
+            currentType = type;
+
+            // 탭 활성화
+            document.querySelectorAll('.type-tab').forEach(tab => {
+                tab.classList.toggle('active', tab.dataset.type === type);
+            });
+
+            // 입력 폼 렌더링
+            renderInputForm();
+            generateQR();
+        }
+
+        // 입력 폼 렌더링
+        function renderInputForm() {
+            const container = document.getElementById('inputForm');
+            let html = '';
+
+            switch(currentType) {
+                case 'text':
+                    html = `
+                        <div class="form-group">
+                            <label class="form-label" data-ko="텍스트" data-en="Text">텍스트</label>
+                            <textarea class="form-textarea" id="textInput" placeholder="QR 코드로 변환할 텍스트를 입력하세요" oninput="generateQR()"></textarea>
+                        </div>
+                    `;
+                    break;
+
+                case 'url':
+                    html = `
+                        <div class="form-group">
+                            <label class="form-label" data-ko="URL" data-en="URL">URL</label>
+                            <input type="url" class="form-input" id="urlInput" placeholder="https://example.com" oninput="generateQR()">
+                        </div>
+                    `;
+                    break;
+
+                case 'email':
+                    html = `
+                        <div class="form-group">
+                            <label class="form-label" data-ko="이메일 주소" data-en="Email Address">이메일 주소</label>
+                            <input type="email" class="form-input" id="emailInput" placeholder="example@email.com" oninput="generateQR()">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" data-ko="제목 (선택사항)" data-en="Subject (Optional)">제목 (선택사항)</label>
+                            <input type="text" class="form-input" id="emailSubject" placeholder="이메일 제목" oninput="generateQR()">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" data-ko="내용 (선택사항)" data-en="Body (Optional)">내용 (선택사항)</label>
+                            <textarea class="form-textarea" id="emailBody" placeholder="이메일 본문" oninput="generateQR()"></textarea>
+                        </div>
+                    `;
+                    break;
+
+                case 'phone':
+                    html = `
+                        <div class="form-group">
+                            <label class="form-label" data-ko="전화번호" data-en="Phone Number">전화번호</label>
+                            <input type="tel" class="form-input" id="phoneInput" placeholder="010-1234-5678" oninput="generateQR()">
+                        </div>
+                    `;
+                    break;
+
+                case 'sms':
+                    html = `
+                        <div class="form-group">
+                            <label class="form-label" data-ko="전화번호" data-en="Phone Number">전화번호</label>
+                            <input type="tel" class="form-input" id="smsPhone" placeholder="010-1234-5678" oninput="generateQR()">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" data-ko="메시지 (선택사항)" data-en="Message (Optional)">메시지 (선택사항)</label>
+                            <textarea class="form-textarea" id="smsMessage" placeholder="SMS 내용" oninput="generateQR()"></textarea>
+                        </div>
+                    `;
+                    break;
+
+                case 'wifi':
+                    html = `
+                        <div class="form-group">
+                            <label class="form-label" data-ko="네트워크 이름 (SSID)" data-en="Network Name (SSID)">네트워크 이름 (SSID)</label>
+                            <input type="text" class="form-input" id="wifiSSID" placeholder="Wi-Fi 이름" oninput="generateQR()">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" data-ko="비밀번호" data-en="Password">비밀번호</label>
+                            <input type="text" class="form-input" id="wifiPassword" placeholder="Wi-Fi 비밀번호" oninput="generateQR()">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" data-ko="보안 타입" data-en="Security Type">보안 타입</label>
+                            <select class="form-select" id="wifiSecurity" onchange="generateQR()">
+                                <option value="WPA">WPA/WPA2</option>
+                                <option value="WEP">WEP</option>
+                                <option value="nopass">없음</option>
+                            </select>
+                        </div>
+                    `;
+                    break;
+
+                case 'vcard':
+                    html = `
+                        <div class="vcard-grid">
+                            <div class="form-group">
+                                <label class="form-label" data-ko="이름" data-en="Name">이름</label>
+                                <input type="text" class="form-input" id="vcardName" placeholder="홍길동" oninput="generateQR()">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" data-ko="회사" data-en="Company">회사</label>
+                                <input type="text" class="form-input" id="vcardOrg" placeholder="회사명" oninput="generateQR()">
+                            </div>
+                        </div>
+                        <div class="vcard-grid">
+                            <div class="form-group">
+                                <label class="form-label" data-ko="전화번호" data-en="Phone">전화번호</label>
+                                <input type="tel" class="form-input" id="vcardPhone" placeholder="010-1234-5678" oninput="generateQR()">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" data-ko="이메일" data-en="Email">이메일</label>
+                                <input type="email" class="form-input" id="vcardEmail" placeholder="email@example.com" oninput="generateQR()">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" data-ko="주소" data-en="Address">주소</label>
+                            <input type="text" class="form-input" id="vcardAddress" placeholder="서울시 강남구..." oninput="generateQR()">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" data-ko="웹사이트" data-en="Website">웹사이트</label>
+                            <input type="url" class="form-input" id="vcardURL" placeholder="https://example.com" oninput="generateQR()">
+                        </div>
+                    `;
+                    break;
+            }
+
+            container.innerHTML = html;
+            window.BaalUtils.updateLanguage();
+        }
+
+        // QR 데이터 생성
+        function getQRData() {
+            switch(currentType) {
+                case 'text':
+                    return document.getElementById('textInput')?.value || '';
+
+                case 'url':
+                    return document.getElementById('urlInput')?.value || '';
+
+                case 'email':
+                    const email = document.getElementById('emailInput')?.value || '';
+                    const subject = document.getElementById('emailSubject')?.value || '';
+                    const body = document.getElementById('emailBody')?.value || '';
+                    if (!email) return '';
+                    let mailto = `mailto:${email}`;
+                    const params = [];
+                    if (subject) params.push(`subject=${encodeURIComponent(subject)}`);
+                    if (body) params.push(`body=${encodeURIComponent(body)}`);
+                    if (params.length > 0) mailto += '?' + params.join('&');
+                    return mailto;
+
+                case 'phone':
+                    const phone = document.getElementById('phoneInput')?.value || '';
+                    return phone ? `tel:${phone}` : '';
+
+                case 'sms':
+                    const smsPhone = document.getElementById('smsPhone')?.value || '';
+                    const smsMessage = document.getElementById('smsMessage')?.value || '';
+                    if (!smsPhone) return '';
+                    return `sms:${smsPhone}${smsMessage ? '?body=' + encodeURIComponent(smsMessage) : ''}`;
+
+                case 'wifi':
+                    const ssid = document.getElementById('wifiSSID')?.value || '';
+                    const password = document.getElementById('wifiPassword')?.value || '';
+                    const security = document.getElementById('wifiSecurity')?.value || 'WPA';
+                    if (!ssid) return '';
+                    return `WIFI:T:${security};S:${ssid};P:${password};;`;
+
+                case 'vcard':
+                    const name = document.getElementById('vcardName')?.value || '';
+                    const org = document.getElementById('vcardOrg')?.value || '';
+                    const tel = document.getElementById('vcardPhone')?.value || '';
+                    const vcEmail = document.getElementById('vcardEmail')?.value || '';
+                    const address = document.getElementById('vcardAddress')?.value || '';
+                    const url = document.getElementById('vcardURL')?.value || '';
+
+                    if (!name) return '';
+
+                    let vcard = 'BEGIN:VCARD\n';
+                    vcard += 'VERSION:3.0\n';
+                    vcard += `FN:${name}\n`;
+                    if (org) vcard += `ORG:${org}\n`;
+                    if (tel) vcard += `TEL:${tel}\n`;
+                    if (vcEmail) vcard += `EMAIL:${vcEmail}\n`;
+                    if (address) vcard += `ADR:${address}\n`;
+                    if (url) vcard += `URL:${url}\n`;
+                    vcard += 'END:VCARD';
+
+                    return vcard;
+
+                default:
+                    return '';
+            }
+        }
+
+        // QR 코드 생성
+        async function generateQR() {
+            const data = getQRData();
+            const preview = document.getElementById('qrPreview');
+            const downloadButtons = document.getElementById('downloadButtons');
+
+            if (!data) {
+                preview.innerHTML = `
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M3 11h8V3H3v8zm2-6h4v4H5V5zm-2 14h8v-8H3v8zm2-6h4v4H5v-4zM13 3v8h8V3h-8zm6 6h-4V5h4v4zm-6 4h2v2h-2v-2zm2 2h2v2h-2v-2zm-2 2h2v2h-2v-2zm4 0h2v2h-2v-2zm2-2h2v2h-2v-2zm0-4h2v2h-2v-2zm-4 0h2v2h-2v-2z"/>
+                    </svg>
+                    <p data-ko="내용을 입력하면 QR 코드가 생성됩니다" data-en="Enter content to generate QR code">내용을 입력하면 QR 코드가 생성됩니다</p>
+                `;
+                downloadButtons.style.display = 'none';
+                window.BaalUtils.updateLanguage();
+                return;
+            }
+
+            const size = parseInt(document.getElementById('qrSize').value);
+            const errorLevel = document.getElementById('errorLevel').value;
+            const colorDark = document.getElementById('colorDark').value;
+            const colorLight = document.getElementById('colorLight').value;
+
+            try {
+                // Canvas 생성
+                const canvas = document.createElement('canvas');
+
+                await QRCode.toCanvas(canvas, data, {
+                    width: size,
+                    margin: 2,
+                    errorCorrectionLevel: errorLevel,
+                    color: {
+                        dark: colorDark,
+                        light: colorLight
+                    }
+                });
+
+                // 로고 추가
+                if (logoImage) {
+                    const ctx = canvas.getContext('2d');
+                    const logoSize = size * 0.2; // QR 코드의 20% 크기
+                    const logoX = (size - logoSize) / 2;
+                    const logoY = (size - logoSize) / 2;
+
+                    // 로고 배경 (흰색 원)
+                    ctx.fillStyle = 'white';
+                    ctx.beginPath();
+                    ctx.arc(size / 2, size / 2, logoSize / 2 + 5, 0, 2 * Math.PI);
+                    ctx.fill();
+
+                    // 로고 그리기
+                    ctx.drawImage(logoImage, logoX, logoY, logoSize, logoSize);
+                }
+
+                // 미리보기 표시
+                preview.innerHTML = `
+                    <div class="qr-preview-canvas">
+                        <canvas id="qrCanvas"></canvas>
+                    </div>
+                `;
+
+                const displayCanvas = document.getElementById('qrCanvas');
+                displayCanvas.width = size;
+                displayCanvas.height = size;
+                displayCanvas.getContext('2d').drawImage(canvas, 0, 0);
+
+                downloadButtons.style.display = 'flex';
+
+                // 전역 변수에 저장
+                window.currentQRCanvas = canvas;
+
+            } catch (error) {
+                console.error('QR 생성 오류:', error);
+                window.BaalUtils.showToast('QR 코드 생성 실패', 'error', 3000);
+            }
+        }
+
+        // 색상 동기화
+        function syncColor(type) {
+            if (type === 'dark') {
+                const text = document.getElementById('colorDarkText').value;
+                document.getElementById('colorDark').value = text;
+            } else {
+                const text = document.getElementById('colorLightText').value;
+                document.getElementById('colorLight').value = text;
+            }
+            generateQR();
+        }
+
+        // 색상 피커 변경 시 텍스트 동기화
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('colorDark').addEventListener('input', (e) => {
+                document.getElementById('colorDarkText').value = e.target.value;
+            });
+            document.getElementById('colorLight').addEventListener('input', (e) => {
+                document.getElementById('colorLightText').value = e.target.value;
+            });
+        });
+
+        // 로고 업로드
+        function handleLogoUpload(event) {
+            const file = event.target.files[0];
+            if (!file) {
+                logoImage = null;
+                generateQR();
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const img = new Image();
+                img.onload = () => {
+                    logoImage = img;
+                    generateQR();
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // QR 다운로드
+        async function downloadQR(format) {
+            if (!window.currentQRCanvas) {
+                window.BaalUtils.showToast('생성된 QR 코드가 없습니다', 'error', 3000);
+                return;
+            }
+
+            const data = getQRData();
+            const filename = `qrcode_${currentType}_${Date.now()}`;
+
+            if (format === 'png') {
+                window.currentQRCanvas.toBlob((blob) => {
+                    window.BaalUtils.downloadFile(blob, `${filename}.png`);
+                });
+            } else if (format === 'svg') {
+                // SVG 생성
+                const size = parseInt(document.getElementById('qrSize').value);
+                const errorLevel = document.getElementById('errorLevel').value;
+                const colorDark = document.getElementById('colorDark').value;
+                const colorLight = document.getElementById('colorLight').value;
+
+                try {
+                    const svg = await QRCode.toString(data, {
+                        type: 'svg',
+                        width: size,
+                        margin: 2,
+                        errorCorrectionLevel: errorLevel,
+                        color: {
+                            dark: colorDark,
+                            light: colorLight
+                        }
+                    });
+
+                    const blob = new Blob([svg], { type: 'image/svg+xml' });
+                    window.BaalUtils.downloadFile(blob, `${filename}.svg`);
+                } catch (error) {
+                    console.error('SVG 생성 오류:', error);
+                    window.BaalUtils.showToast('SVG 생성 실패', 'error', 3000);
+                }
+            }
+
+            window.BaalUtils.showToast('다운로드 완료!', 'success', 3000);
+        }
+
+        // 초기화
+        renderInputForm();
+    </script>
+</body>
+</html>
