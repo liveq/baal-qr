@@ -34,9 +34,6 @@
         gtag('config', 'G-XXXXXXXXXX');
     </script>
 
-    <!-- 라이브러리 -->
-    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js" onerror="this.onerror=null; this.src='https://unpkg.com/qrcode@1.5.3/build/qrcode.min.js';"></script>
-
     <!-- 공통 스타일 -->
     <link rel="stylesheet" href="_common/common.css">
     <style>
@@ -402,6 +399,10 @@
 
     <!-- 공통 스크립트 -->
     <script src="_common/common.js"></script>
+
+    <!-- QRCode 라이브러리 (body 끝에 로드) -->
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+
     <script>
         let currentType = 'text';
         let logoImage = null;
@@ -789,7 +790,7 @@
         }
 
         // 초기화
-        window.addEventListener('DOMContentLoaded', function() {
+        (function() {
             // QRCode 라이브러리 로드 확인
             if (typeof QRCode === 'undefined') {
                 console.error('QRCode 라이브러리가 로드되지 않았습니다. CDN 접근을 확인하세요.');
@@ -797,12 +798,12 @@
                 if (container) {
                     const warning = document.createElement('div');
                     warning.style.cssText = 'background: #fff3cd; color: #856404; padding: 15px; border-radius: 8px; margin: 20px; border: 1px solid #ffeaa7;';
-                    warning.innerHTML = '<strong>⚠️ QR 코드 라이브러리 로드 실패</strong><br>광고 차단기를 비활성화하거나 페이지를 새로고침해주세요.';
+                    warning.innerHTML = '<strong>⚠️ QR 코드 라이브러리 로드 실패</strong><br>페이지를 새로고침해주세요.';
                     container.insertBefore(warning, container.firstChild);
                 }
             }
             renderInputForm();
-        });
+        })();
     </script>
 </body>
 </html>
