@@ -329,5 +329,6 @@ window.BaalUtils = {
     hideLoading,
     downloadFile,
     initDropzone,
-    detectBrowserLanguage
+    detectBrowserLanguage,
+    updateLanguage
 };
