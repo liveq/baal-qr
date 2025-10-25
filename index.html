@@ -291,7 +291,7 @@
 
                     <div class="form-group">
                         <label class="form-label" data-ko="크기" data-en="Size">크기</label>
-                        <select class="form-select" id="qrSize" onchange="generateQR()">
+                        <select class="form-select" id="qrSize">
                             <option value="200">200 x 200</option>
                             <option value="300" selected>300 x 300</option>
                             <option value="400">400 x 400</option>
@@ -303,7 +303,7 @@
 
                     <div class="form-group">
                         <label class="form-label" data-ko="에러 수정 레벨" data-en="Error Correction">에러 수정 레벨</label>
-                        <select class="form-select" id="errorLevel" onchange="generateQR()">
+                        <select class="form-select" id="errorLevel">
                             <option value="L">L (7%)</option>
                             <option value="M" selected>M (15%)</option>
                             <option value="Q">Q (25%)</option>
@@ -317,14 +317,14 @@
                             <div>
                                 <label style="font-size: 0.85em; color: var(--text-secondary); display: block; margin-bottom: 5px;" data-ko="전경색" data-en="Foreground">전경색</label>
                                 <div class="color-input-wrapper">
-                                    <input type="color" id="colorDark" value="#000000" onchange="generateQR()">
+                                    <input type="color" id="colorDark" value="#000000">
                                     <input type="text" class="form-input" id="colorDarkText" value="#000000" style="flex: 1;" onchange="syncColor('dark')">
                                 </div>
                             </div>
                             <div>
                                 <label style="font-size: 0.85em; color: var(--text-secondary); display: block; margin-bottom: 5px;" data-ko="배경색" data-en="Background">배경색</label>
                                 <div class="color-input-wrapper">
-                                    <input type="color" id="colorLight" value="#ffffff" onchange="generateQR()">
+                                    <input type="color" id="colorLight" value="#ffffff">
                                     <input type="text" class="form-input" id="colorLightText" value="#ffffff" style="flex: 1;" onchange="syncColor('light')">
                                 </div>
                             </div>
@@ -338,6 +338,23 @@
                             <span data-ko="로고는 QR 코드 중앙에 표시됩니다" data-en="Logo will be placed in the center">로고는 QR 코드 중앙에 표시됩니다</span>
                         </small>
                     </div>
+
+                    <!-- QR 생성 버튼 -->
+                    <div style="margin-top: 25px;">
+                        <button id="generateBtn" onclick="generateQR()" style="width: 100%; padding: 14px 24px; background: var(--gold-gradient); color: white; border: none; border-radius: 8px; font-size: 1em; font-weight: 600; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);">
+                            <span data-ko="✨ QR 코드 생성" data-en="✨ Generate QR Code">✨ QR 코드 생성</span>
+                        </button>
+                    </div>
+                    <style>
+                        #generateBtn:hover {
+                            transform: translateY(-2px);
+                            box-shadow: 0 6px 20px rgba(212, 175, 55, 0.4);
+                        }
+                        #generateBtn:active {
+                            transform: translateY(0);
+                            box-shadow: 0 2px 8px rgba(212, 175, 55, 0.3);
+                        }
+                    </style>
                 </div>
 
                 <!-- 미리보기 섹션 -->
@@ -400,7 +417,6 @@
 
             // 입력 폼 렌더링
             renderInputForm();
-            generateQR();
         }
 
         // 입력 폼 렌더링
@@ -413,7 +429,7 @@
                     html = `
                         <div class="form-group">
                             <label class="form-label" data-ko="텍스트" data-en="Text">텍스트</label>
-                            <textarea class="form-textarea" id="textInput" placeholder="QR 코드로 변환할 텍스트를 입력하세요" oninput="generateQR()"></textarea>
+                            <textarea class="form-textarea" id="textInput" placeholder="QR 코드로 변환할 텍스트를 입력하세요"></textarea>
                         </div>
                     `;
                     break;
@@ -422,7 +438,7 @@
                     html = `
                         <div class="form-group">
                             <label class="form-label" data-ko="URL" data-en="URL">URL</label>
-                            <input type="url" class="form-input" id="urlInput" placeholder="https://example.com" oninput="generateQR()">
+                            <input type="url" class="form-input" id="urlInput" placeholder="https://example.com">
                         </div>
                     `;
                     break;
@@ -431,15 +447,15 @@
                     html = `
                         <div class="form-group">
                             <label class="form-label" data-ko="이메일 주소" data-en="Email Address">이메일 주소</label>
-                            <input type="email" class="form-input" id="emailInput" placeholder="example@email.com" oninput="generateQR()">
+                            <input type="email" class="form-input" id="emailInput" placeholder="example@email.com">
                         </div>
                         <div class="form-group">
                             <label class="form-label" data-ko="제목 (선택사항)" data-en="Subject (Optional)">제목 (선택사항)</label>
-                            <input type="text" class="form-input" id="emailSubject" placeholder="이메일 제목" oninput="generateQR()">
+                            <input type="text" class="form-input" id="emailSubject" placeholder="이메일 제목">
                         </div>
                         <div class="form-group">
                             <label class="form-label" data-ko="내용 (선택사항)" data-en="Body (Optional)">내용 (선택사항)</label>
-                            <textarea class="form-textarea" id="emailBody" placeholder="이메일 본문" oninput="generateQR()"></textarea>
+                            <textarea class="form-textarea" id="emailBody" placeholder="이메일 본문"></textarea>
                         </div>
                     `;
                     break;
@@ -448,7 +464,7 @@
                     html = `
                         <div class="form-group">
                             <label class="form-label" data-ko="전화번호" data-en="Phone Number">전화번호</label>
-                            <input type="tel" class="form-input" id="phoneInput" placeholder="010-1234-5678" oninput="generateQR()">
+                            <input type="tel" class="form-input" id="phoneInput" placeholder="010-1234-5678">
                         </div>
                     `;
                     break;
@@ -457,11 +473,11 @@
                     html = `
                         <div class="form-group">
                             <label class="form-label" data-ko="전화번호" data-en="Phone Number">전화번호</label>
-                            <input type="tel" class="form-input" id="smsPhone" placeholder="010-1234-5678" oninput="generateQR()">
+                            <input type="tel" class="form-input" id="smsPhone" placeholder="010-1234-5678">
                         </div>
                         <div class="form-group">
                             <label class="form-label" data-ko="메시지 (선택사항)" data-en="Message (Optional)">메시지 (선택사항)</label>
-                            <textarea class="form-textarea" id="smsMessage" placeholder="SMS 내용" oninput="generateQR()"></textarea>
+                            <textarea class="form-textarea" id="smsMessage" placeholder="SMS 내용"></textarea>
                         </div>
                     `;
                     break;
@@ -470,15 +486,15 @@
                     html = `
                         <div class="form-group">
                             <label class="form-label" data-ko="네트워크 이름 (SSID)" data-en="Network Name (SSID)">네트워크 이름 (SSID)</label>
-                            <input type="text" class="form-input" id="wifiSSID" placeholder="Wi-Fi 이름" oninput="generateQR()">
+                            <input type="text" class="form-input" id="wifiSSID" placeholder="Wi-Fi 이름">
                         </div>
                         <div class="form-group">
                             <label class="form-label" data-ko="비밀번호" data-en="Password">비밀번호</label>
-                            <input type="text" class="form-input" id="wifiPassword" placeholder="Wi-Fi 비밀번호" oninput="generateQR()">
+                            <input type="text" class="form-input" id="wifiPassword" placeholder="Wi-Fi 비밀번호">
                         </div>
                         <div class="form-group">
                             <label class="form-label" data-ko="보안 타입" data-en="Security Type">보안 타입</label>
-                            <select class="form-select" id="wifiSecurity" onchange="generateQR()">
+                            <select class="form-select" id="wifiSecurity">
                                 <option value="WPA">WPA/WPA2</option>
                                 <option value="WEP">WEP</option>
                                 <option value="nopass">없음</option>
@@ -492,30 +508,30 @@
                         <div class="vcard-grid">
                             <div class="form-group">
                                 <label class="form-label" data-ko="이름" data-en="Name">이름</label>
-                                <input type="text" class="form-input" id="vcardName" placeholder="홍길동" oninput="generateQR()">
+                                <input type="text" class="form-input" id="vcardName" placeholder="홍길동">
                             </div>
                             <div class="form-group">
                                 <label class="form-label" data-ko="회사" data-en="Company">회사</label>
-                                <input type="text" class="form-input" id="vcardOrg" placeholder="회사명" oninput="generateQR()">
+                                <input type="text" class="form-input" id="vcardOrg" placeholder="회사명">
                             </div>
                         </div>
                         <div class="vcard-grid">
                             <div class="form-group">
                                 <label class="form-label" data-ko="전화번호" data-en="Phone">전화번호</label>
-                                <input type="tel" class="form-input" id="vcardPhone" placeholder="010-1234-5678" oninput="generateQR()">
+                                <input type="tel" class="form-input" id="vcardPhone" placeholder="010-1234-5678">
                             </div>
                             <div class="form-group">
                                 <label class="form-label" data-ko="이메일" data-en="Email">이메일</label>
-                                <input type="email" class="form-input" id="vcardEmail" placeholder="email@example.com" oninput="generateQR()">
+                                <input type="email" class="form-input" id="vcardEmail" placeholder="email@example.com">
                             </div>
                         </div>
                         <div class="form-group">
                             <label class="form-label" data-ko="주소" data-en="Address">주소</label>
-                            <input type="text" class="form-input" id="vcardAddress" placeholder="서울시 강남구..." oninput="generateQR()">
+                            <input type="text" class="form-input" id="vcardAddress" placeholder="서울시 강남구...">
                         </div>
                         <div class="form-group">
                             <label class="form-label" data-ko="웹사이트" data-en="Website">웹사이트</label>
-                            <input type="url" class="form-input" id="vcardURL" placeholder="https://example.com" oninput="generateQR()">
+                            <input type="url" class="form-input" id="vcardURL" placeholder="https://example.com">
                         </div>
                     `;
                     break;
