@@ -44,6 +44,11 @@ const initLangToggle = () => {
 
 // 언어별 텍스트 업데이트
 const updateLanguage = (lang) => {
+    // 매개변수가 없으면 현재 언어 사용
+    if (!lang) {
+        lang = document.body.getAttribute('data-lang') || localStorage.getItem('lang') || 'ko';
+    }
+
     const elements = document.querySelectorAll('[data-ko][data-en]');
     elements.forEach(el => {
         const text = lang === 'ko' ? el.getAttribute('data-ko') : el.getAttribute('data-en');
