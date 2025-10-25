@@ -591,7 +591,7 @@
         }
 
         // QR 코드 생성
-        async function generateQR() {
+        function generateQR() {
             const data = getQRData();
             const preview = document.getElementById('qrPreview');
             const downloadButtons = document.getElementById('downloadButtons');
@@ -613,58 +613,64 @@
             const colorDark = document.getElementById('colorDark').value;
             const colorLight = document.getElementById('colorLight').value;
 
-            try {
-                // Canvas 생성
-                const canvas = document.createElement('canvas');
+            // Canvas 생성
+            const canvas = document.createElement('canvas');
 
-                await QRCode.toCanvas(canvas, data, {
-                    width: size,
-                    margin: 2,
-                    errorCorrectionLevel: errorLevel,
-                    color: {
-                        dark: colorDark,
-                        light: colorLight
-                    }
-                });
-
-                // 로고 추가
-                if (logoImage) {
-                    const ctx = canvas.getContext('2d');
-                    const logoSize = size * 0.2; // QR 코드의 20% 크기
-                    const logoX = (size - logoSize) / 2;
-                    const logoY = (size - logoSize) / 2;
-
-                    // 로고 배경 (흰색 원)
-                    ctx.fillStyle = 'white';
-                    ctx.beginPath();
-                    ctx.arc(size / 2, size / 2, logoSize / 2 + 5, 0, 2 * Math.PI);
-                    ctx.fill();
-
-                    // 로고 그리기
-                    ctx.drawImage(logoImage, logoX, logoY, logoSize, logoSize);
+            QRCode.toCanvas(canvas, data, {
+                width: size,
+                margin: 2,
+                errorCorrectionLevel: errorLevel,
+                color: {
+                    dark: colorDark,
+                    light: colorLight
+                }
+            }, function (error) {
+                if (error) {
+                    console.error('QR 생성 오류:', error);
+                    window.BaalUtils.showToast('QR 코드 생성 실패: ' + error.message, 'error', 3000);
+                    return;
                 }
 
-                // 미리보기 표시
-                preview.innerHTML = `
-                    <div class="qr-preview-canvas">
-                        <canvas id="qrCanvas"></canvas>
-                    </div>
-                `;
+                try {
+                    // 로고 추가
+                    if (logoImage) {
+                        const ctx = canvas.getContext('2d');
+                        const logoSize = size * 0.2; // QR 코드의 20% 크기
+                        const logoX = (size - logoSize) / 2;
+                        const logoY = (size - logoSize) / 2;
 
-                const displayCanvas = document.getElementById('qrCanvas');
-                displayCanvas.width = size;
-                displayCanvas.height = size;
-                displayCanvas.getContext('2d').drawImage(canvas, 0, 0);
+                        // 로고 배경 (흰색 원)
+                        ctx.fillStyle = 'white';
+                        ctx.beginPath();
+                        ctx.arc(size / 2, size / 2, logoSize / 2 + 5, 0, 2 * Math.PI);
+                        ctx.fill();
 
-                downloadButtons.style.display = 'flex';
+                        // 로고 그리기
+                        ctx.drawImage(logoImage, logoX, logoY, logoSize, logoSize);
+                    }
 
-                // 전역 변수에 저장
-                window.currentQRCanvas = canvas;
+                    // 미리보기 표시
+                    preview.innerHTML = `
+                        <div class="qr-preview-canvas">
+                            <canvas id="qrCanvas"></canvas>
+                        </div>
+                    `;
 
-            } catch (error) {
-                console.error('QR 생성 오류:', error);
-                window.BaalUtils.showToast('QR 코드 생성 실패', 'error', 3000);
-            }
+                    const displayCanvas = document.getElementById('qrCanvas');
+                    displayCanvas.width = size;
+                    displayCanvas.height = size;
+                    displayCanvas.getContext('2d').drawImage(canvas, 0, 0);
+
+                    downloadButtons.style.display = 'flex';
+
+                    // 전역 변수에 저장
+                    window.currentQRCanvas = canvas;
+
+                } catch (error) {
+                    console.error('QR 표시 오류:', error);
+                    window.BaalUtils.showToast('QR 코드 표시 실패', 'error', 3000);
+                }
+            });
         }
 
         // 색상 동기화
@@ -711,7 +717,7 @@
         }
 
         // QR 다운로드
-        async function downloadQR(format) {
+        function downloadQR(format) {
             if (!window.currentQRCanvas) {
                 window.BaalUtils.showToast('생성된 QR 코드가 없습니다', 'error', 3000);
                 return;
@@ -723,7 +729,9 @@
             if (format === 'png') {
                 window.currentQRCanvas.toBlob((blob) => {
                     window.BaalUtils.downloadFile(blob, `${filename}.png`);
+                    window.BaalUtils.showToast('다운로드 완료!', 'success', 3000);
                 });
+                return; // 콜백이 처리하므로 여기서 리턴
             } else if (format === 'svg') {
                 // SVG 생성
                 const size = parseInt(document.getElementById('qrSize').value);
@@ -731,24 +739,27 @@
                 const colorDark = document.getElementById('colorDark').value;
                 const colorLight = document.getElementById('colorLight').value;
 
-                try {
-                    const svg = await QRCode.toString(data, {
-                        type: 'svg',
-                        width: size,
-                        margin: 2,
-                        errorCorrectionLevel: errorLevel,
-                        color: {
-                            dark: colorDark,
-                            light: colorLight
-                        }
-                    });
+                QRCode.toString(data, {
+                    type: 'svg',
+                    width: size,
+                    margin: 2,
+                    errorCorrectionLevel: errorLevel,
+                    color: {
+                        dark: colorDark,
+                        light: colorLight
+                    }
+                }, function (error, svg) {
+                    if (error) {
+                        console.error('SVG 생성 오류:', error);
+                        window.BaalUtils.showToast('SVG 생성 실패: ' + error.message, 'error', 3000);
+                        return;
+                    }
 
                     const blob = new Blob([svg], { type: 'image/svg+xml' });
                     window.BaalUtils.downloadFile(blob, `${filename}.svg`);
-                } catch (error) {
-                    console.error('SVG 생성 오류:', error);
-                    window.BaalUtils.showToast('SVG 생성 실패', 'error', 3000);
-                }
+                    window.BaalUtils.showToast('다운로드 완료!', 'success', 3000);
+                });
+                return; // 콜백이 처리하므로 여기서 리턴
             }
 
             window.BaalUtils.showToast('다운로드 완료!', 'success', 3000);
