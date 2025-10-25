@@ -252,11 +252,11 @@
                     <div class="form-group">
                         <label class="form-label" data-ko="QR 타입" data-en="QR Type">QR 타입</label>
                         <div class="type-tabs">
-                            <button class="type-tab active" data-type="text" onclick="selectType('text')">
-                                <span data-ko="텍스트" data-en="Text">텍스트</span>
-                            </button>
-                            <button class="type-tab" data-type="url" onclick="selectType('url')">
+                            <button class="type-tab active" data-type="url" onclick="selectType('url')">
                                 <span data-ko="URL" data-en="URL">URL</span>
+                            </button>
+                            <button class="type-tab" data-type="text" onclick="selectType('text')">
+                                <span data-ko="텍스트" data-en="Text">텍스트</span>
                             </button>
                             <button class="type-tab" data-type="email" onclick="selectType('email')">
                                 <span data-ko="이메일" data-en="Email">이메일</span>
@@ -404,7 +404,7 @@
     <script src="qrcode.min.js"></script>
 
     <script>
-        let currentType = 'text';
+        let currentType = 'url';
         let logoImage = null;
 
         // 타입 선택
