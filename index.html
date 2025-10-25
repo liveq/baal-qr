@@ -185,6 +185,7 @@
             cursor: pointer;
             font-size: 0.9em;
             transition: all 0.2s;
+            color: var(--text-primary);
         }
 
         .type-tab:hover {
@@ -231,9 +232,12 @@
                     <span style="color: var(--gold-primary); font-weight: 700; font-size: 1.5em;">BAAL</span>
                 </a>
             </div>
-            <div class="language-toggle">
-                <button id="langBtn" onclick="window.BaalUtils.toggleLanguage()">
-                    <span data-ko="🇰🇷 한국어" data-en="🇺🇸 English">🇰🇷 한국어</span>
+            <div class="header-buttons">
+                <button id="darkModeBtn" onclick="window.BaalUtils.toggleDarkMode()" title="다크모드 전환">
+                    🌙
+                </button>
+                <button id="langBtn" onclick="window.BaalUtils.toggleLanguage()" title="언어 전환">
+                    🌐
                 </button>
             </div>
         </header>
