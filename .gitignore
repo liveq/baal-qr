@@ -75,3 +75,5 @@ backup/
 test-files/
 demo-files/
 sample-data/
+node_modules/
+package-lock.json
