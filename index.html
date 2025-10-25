@@ -281,9 +281,16 @@
                         <!-- JavaScript로 렌더링 -->
                     </div>
 
+                    <!-- QR 생성 버튼 (상단) -->
+                    <div style="margin-top: 20px;">
+                        <button id="generateBtnTop" onclick="generateQR()" style="width: 100%; padding: 14px 24px; background: var(--gold-gradient); color: white; border: none; border-radius: 8px; font-size: 1em; font-weight: 600; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);">
+                            <span data-ko="✨ QR 코드 생성" data-en="✨ Generate QR Code">✨ QR 코드 생성</span>
+                        </button>
+                    </div>
+
                     <!-- 옵션 -->
                     <h3 style="margin: 25px 0 15px 0; font-size: 1.1em;">
-                        <span data-ko="옵션" data-en="Options">옵션</span>
+                        <span data-ko="옵션 (선택사항)" data-en="Options (Optional)">옵션 (선택사항)</span>
                     </h3>
 
                     <div class="form-group">
@@ -343,11 +350,13 @@
                         </button>
                     </div>
                     <style>
-                        #generateBtn:hover {
+                        #generateBtn:hover,
+                        #generateBtnTop:hover {
                             transform: translateY(-2px);
                             box-shadow: 0 6px 20px rgba(212, 175, 55, 0.4);
                         }
-                        #generateBtn:active {
+                        #generateBtn:active,
+                        #generateBtnTop:active {
                             transform: translateY(0);
                             box-shadow: 0 2px 8px rgba(212, 175, 55, 0.3);
                         }
